@@ -6,6 +6,13 @@ The library will send a message into a slack channel for every uncompleted task 
 a user has spent on that task.
 This library is meant to be run once a day, to assist with morning standups.
 
+You will recieve these messages similar to these in slack using this gem
+```
+James has spent 2 days working on Student Admissions 
+
+Johnny has spent 12 hours working on User authentication 
+```
+
 ## Installation 
 
 ```
