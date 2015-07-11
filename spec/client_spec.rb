@@ -13,7 +13,6 @@ describe "json client" do
   end
 
   after do
-    # @store.delete(medical_entity_key)
     @store.delete(whois_key)
     @store.clear
     @store.close

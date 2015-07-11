@@ -42,37 +42,5 @@ RSpec.configure do |config|
   #  end
   #end
 
-  #def a_delete(path)
-  #  a_request(:delete, ZipCodeServices::base_uri + path)
-  #end
-
-  #def a_get(path)
-  #  a_request(:get, ZipCodeServices::base_uri + path)
-  #end
-
-  #def a_post(path)
-  #  a_request(:post, ZipCodeServices::base_uri + path)
-  #end
-
-  #def a_put(path)
-  #  a_request(:put, ZipCodeServices::base_uri + path)
-  #end
-
-  #def stub_delete(path)
-  #  stup_request(:delete, ZipCodeServices::base_uri + path)
-  #end
-
-  #def stub_get(path)
-  #  stup_request(:get, ZipCodeServices::base_uri + path)
-  #end
-
-  #def stub_post(path)
-  #  stup_request(:post, ZipCodeServices::base_uri + path)
-  #end
-
-  #def stub_put(path)
-  #  stup_request(:put, ZipCodeServices::base_uri + path)
-  #end
-
 
 end
