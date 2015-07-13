@@ -1,5 +1,6 @@
 Whois Slacking.
 =================
+[![Gem Version](https://badge.fury.io/rb/whois_slacking.svg)](http://badge.fury.io/rb/whois_slacking)
 
 This is a ruby library that integrates Pivotal Tracker and Slack.
 The library will send a message into a slack channel for every uncompleted task in pivotal, saying how long

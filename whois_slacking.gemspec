@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.date        = '2015-07-09'
   s.summary     = "whois_slacking for whois_slacking.com"
-  s.description = "Ruby Client for whois_slacking.com.  Gives ip address and radius queries.  Visit whois_slacking.com for more details"
+  s.description = "Pivotal/Slack integration that sends a (daily) message of how long each user has worked on a pivotal task into a slack channel/room"
   s.authors     = ["W Watson"]
   s.email       = 'wolfpack@vulk.com'
   s.files       = ["lib/whois_slacking.rb"]
