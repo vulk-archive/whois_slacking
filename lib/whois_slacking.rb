@@ -55,7 +55,11 @@ module WhoIsSlacking
         .pivotal_project( WhoIsSlacking::Pivotal.project_name)
       tasks = WhoIsSlacking::Pivotal.project_stories(project_object) 
       tasks.each do |task|
-        if task.current_state != 'unstarted' && task.owned_by &&
+        if task.current_state != 'unstarted' && 
+            task.owned_by && 
+            task.current_state != 'restart' &&
+            task.current_state != 'unestimated' &&
+            task.current_state != 'unscheduled' &&
             task.current_state != 'accepted' 
           WhoIsSlacking::DataTools.save_task(project_object.name, task.id, task.name, task.owned_by, task.current_state, task.accepted_at )
         end
@@ -138,7 +142,8 @@ module WhoIsSlacking
         mkey = self.whois_key(project, task_id, user)
         entity_exists = store[mkey]
 
-        if entity_exists #   -- if task/username combo exists and is not completed in db
+        if entity_exists && 
+            entity_exists[:current_state] != 'finished' #   -- if task/username combo exists and is not delivered/finished in db
           #     -- calculate how long (realtime) the task has been worked on in days (.5, 1.5 etc)
           #     -- update time on task
           #     -- save who started task
@@ -150,10 +155,10 @@ module WhoIsSlacking
 
           days_worked = TimeDifference.between(DateTime.now,  start_dt).in_days 
           if days_worked >= 1.0 
-            message = "#{user} has spent #{days_worked.to_i} days working on #{task}"
+            message = "*#{user} has spent #{days_worked.to_i} days working on #{task}*"
           else # show hours instead
             hours_worked = TimeDifference.between(DateTime.now,  start_dt).in_hours
-            message = "#{user} has spent #{hours_worked.to_i} hours working on #{task}"
+            message = "*#{user} has spent #{hours_worked.to_i} hours working on #{task}*"
           end
           # keep the created dt and start_dt
           created_dt = entity_exists[:created_dt]
@@ -162,6 +167,8 @@ module WhoIsSlacking
           task_entity["start_dt"] = start_dt
           store[mkey] = task_entity 
 
+        elsif entity_exists && entity_exists[:current_state] == 'finished' 
+          # don't do anything
         else #   -- if task/username combo does not exist in db
           #     -- save project/task/user 
           #     -- save when task was started
@@ -172,13 +179,18 @@ module WhoIsSlacking
             #       -- save status as status not-completed
             #       -- publish message task/user started today
             #         -- "Today Johnny started 'As a user I should be able to log in'"
-            message = "Today #{user} started #{task}"
+            message = "*Today #{user} started #{task}*"
 
           elsif current_state == "finished" #     -- if task is completed in pivotal
             #       -- save status as status completed
             #       -- publish message task/user started today
             #         -- "Today Johnny completed 'As a user I should be able to log in'"
-            message = "Today #{user} finished #{task}"
+            message = "*Today #{user} finished #{task}*"
+          elsif current_state == "delivered" #     -- if task is completed in pivotal
+            #       -- save status as status completed
+            #       -- publish message task/user started today
+            #         -- "Today Johnny completed 'As a user I should be able to log in'"
+            message = "*Today #{user} delivered #{task}*"
           end
 
         end

@@ -30,6 +30,7 @@ config/database.yml
 .*.swp
 .*.swo
 .env
+.env-*
 *.gem
 /spec/vcr_cassettes/*
 /tags

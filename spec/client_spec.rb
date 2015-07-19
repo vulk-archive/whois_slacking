@@ -103,23 +103,23 @@ describe "json client" do
 
   it "should post to slack 'Today xx started xxx' when a non completed task exists in pivotal but not in the db" do
     expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)
-      .fetch("message", nil).fetch("text", nil)) .to eql "Today user started task"
+      .fetch("message", nil).fetch("text", nil)) .to eql "*Today user started task*"
   end
 
   it "should post to slack 'Today xx completed xxx' when a completed task exists in pivotal but not in the db" do
     current_state = 'finished'
     expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)
-      .fetch("message", nil).fetch("text", nil)) .to eql "Today user finished task"
+      .fetch("message", nil).fetch("text", nil)) .to eql "*Today user finished task*"
   end
 
-  def direct_save(start_dt = (DateTime.now - 1))
+
+  def direct_save(start_dt = (DateTime.now - 1), cstate = current_state)
     accepted_at = accepted_at 
     created_dt = DateTime.now.to_s
     updated_dt = created_dt
-    current_state = current_state 
     active = true
     message = nil 
-    task_entity = {project: project, task_id: task_id, task: task, user: user, current_state: current_state, active: active, start_dt: start_dt, created_dt: created_dt, accepted_at: accepted_at, updated_dt: updated_dt}
+    task_entity = {project: project, task_id: task_id, task: task, user: user, current_state: cstate, active: active, start_dt: start_dt, created_dt: created_dt, accepted_at: accepted_at, updated_dt: updated_dt}
     store = WhoIsSlacking::DataTools.whois_store
     mutex = Moneta::Mutex.new(store, 'moneta')
     mutex.synchronize do
@@ -128,18 +128,24 @@ describe "json client" do
     end
   end
 
+  it "should not post to slack when a finished task exists in pivotal *and* in the db" do
+    accepted_dt = DateTime.now - 1
+    direct_save(accepted_dt, 'finished')
+    expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)).to eql nil
+  end
+
   it "should post to slack 'xx has spent xx days working on xxx' when a non completed task exists in pivotal and in the db" do
     accepted_dt = DateTime.now - 1
     direct_save
     expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)
-      .fetch("message", nil).fetch("text", nil)) .to eql "user has spent 1 days working on task"  
+      .fetch("message", nil).fetch("text", nil)) .to eql "*user has spent 1 days working on task*"  
   end
 
   it "should post to slack 'xx has spent xx hours working on xxx' when a non completed task exists in pivotal and in the db and the days worked is less than 1" do
     start_dt = DateTime.now - 0.5
     direct_save(start_dt)
     expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)
-      .fetch("message", nil).fetch("text", nil)) .to eql "user has spent 12 hours working on task"  
+      .fetch("message", nil).fetch("text", nil)) .to eql "*user has spent 12 hours working on task*"  
   end
 
   it "should run through all tasks for a project, sending a message into slack for each of them" do
