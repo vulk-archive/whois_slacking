@@ -21,7 +21,7 @@ gem install whois_slacking
 ```
 Update the .env file with the proper tokens
 
-Call the slackcron.rb file in the base directory (or create your own cronscript)
+Call the slackcron.rb file in the base directory (or create your own cronscript).
 Create a cronjob that calls the script:
 ```
 0 8 * * * /bin/bash -l -c 'rvm use 2.1.5 ; . $HOME/path-to-env/.env ; ruby $HOME/path-to-cronscript/slackcron.rb > /tmp/slackcron.log'
