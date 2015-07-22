@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    whois_slacking (0.0.2)
+    whois_slacking (0.0.3)
       dotenv (~> 2.0.2)
       moneta (~> 0.8.0)
       multi_xml (~> 0.5)

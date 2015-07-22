@@ -179,7 +179,7 @@ module WhoIsSlacking
             #       -- save status as status not-completed
             #       -- publish message task/user started today
             #         -- "Today Johnny started 'As a user I should be able to log in'"
-            message = "*Today #{user} started #{task}*"
+            message = "*Now tracking #{user} as doing #{task}*"
 
           elsif current_state == "finished" #     -- if task is completed in pivotal
             #       -- save status as status completed

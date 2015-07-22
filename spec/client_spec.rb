@@ -101,9 +101,9 @@ describe "json client" do
     expect(WhoIsSlacking::SlackWrapper.post_to_slack(message)["ok"]).to eql true 
   end
 
-  it "should post to slack 'Today xx started xxx' when a non completed task exists in pivotal but not in the db" do
+  it "should post to slack 'Now tracking xx as doing xxx' when a non completed task exists in pivotal but not in the db" do
     expect(WhoIsSlacking::DataTools.save_task(project, task_id, task, user, current_state, accepted_dt)
-      .fetch("message", nil).fetch("text", nil)) .to eql "*Today user started task*"
+      .fetch("message", nil).fetch("text", nil)) .to eql "*Now tracking user as doing task*"
   end
 
   it "should post to slack 'Today xx completed xxx' when a completed task exists in pivotal but not in the db" do
