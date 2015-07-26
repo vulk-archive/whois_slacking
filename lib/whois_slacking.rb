@@ -143,7 +143,9 @@ module WhoIsSlacking
         entity_exists = store[mkey]
 
         if entity_exists && 
-            entity_exists[:current_state] != 'finished' #   -- if task/username combo exists and is not delivered/finished in db
+            entity_exists[:current_state] != 'finished' &&
+            entity_exists[:current_state] != 'delivered' && 
+            entity_exists[:current_state] != 'accepted' #   -- if task/username combo exists and is not delivered/finished in db
           #     -- calculate how long (realtime) the task has been worked on in days (.5, 1.5 etc)
           #     -- update time on task
           #     -- save who started task
@@ -152,45 +154,58 @@ module WhoIsSlacking
           # keep created at date 
 
           start_dt = entity_exists[:start_dt].to_datetime
+          puts "start_dt in db was #{start_dt}"
 
           days_worked = TimeDifference.between(DateTime.now,  start_dt).in_days 
           if days_worked >= 1.0 
             message = "*#{user} has spent #{days_worked.to_i} days working on #{task}*"
           else # show hours instead
-            hours_worked = TimeDifference.between(DateTime.now,  start_dt).in_hours
-            message = "*#{user} has spent #{hours_worked.to_i} hours working on #{task}*"
+            # hours_worked = TimeDifference.between(DateTime.now,  start_dt).in_hours
+            # message = "*#{user} has spent #{hours_worked.to_i} hours working on #{task}*"
+            message = "*#{user} has spent less than a day working on #{task}*"
           end
           # keep the created dt and start_dt
           created_dt = entity_exists[:created_dt]
           start_dt = entity_exists[:start_dt].to_datetime
           task_entity["created_dt"] = created_dt
-          task_entity["start_dt"] = start_dt
+          task_entity["start_dt"] = start_dt.to_s
+          puts "start_dt in db will be #{start_dt}"
           store[mkey] = task_entity 
 
+        elsif entity_exists && entity_exists[:current_state] == 'delivered' && current_state == 'delivered'
+          start_dt = entity_exists[:start_dt].to_datetime
+          puts "start_dt in db for delivered state was #{start_dt}"
+
+          days_worked = TimeDifference.between(DateTime.now,  start_dt).in_days 
+          if days_worked >= 1.0 
+            message = "*Task #{task} has been in a delivered state for #{days_worked.to_i} days*"
+          else
+            message = "*Task #{task} has been in a delivered state for less than a day*"
+          end
         elsif entity_exists && entity_exists[:current_state] == 'finished' 
-          # don't do anything
+          # don't do anything if entity already exists as delivered
         else #   -- if task/username combo does not exist in db
           #     -- save project/task/user 
           #     -- save when task was started
           #     -- save who started task
           store[mkey] = task_entity 
 
-          if current_state != "finished" #     -- if task is not-completed in pivotal
+          if current_state != "finished" #     -- if task is not-completed in pivotal and is not in db
             #       -- save status as status not-completed
             #       -- publish message task/user started today
             #         -- "Today Johnny started 'As a user I should be able to log in'"
             message = "*Now tracking #{user} as doing #{task}*"
 
-          elsif current_state == "finished" #     -- if task is completed in pivotal
+          elsif current_state == "finished" #     -- if task is completed in pivotal and is not in db
             #       -- save status as status completed
             #       -- publish message task/user started today
             #         -- "Today Johnny completed 'As a user I should be able to log in'"
-            message = "*Today #{user} finished #{task}*"
+            message = "*Today #{user} finished #{task} and it is waiting to be delivered*"
           elsif current_state == "delivered" #     -- if task is completed in pivotal
             #       -- save status as status completed
             #       -- publish message task/user started today
             #         -- "Today Johnny completed 'As a user I should be able to log in'"
-            message = "*Today #{user} delivered #{task}*"
+            message = "*Today #{user} delivered #{task} and it is waiting to be accepted*"
           end
 
         end
