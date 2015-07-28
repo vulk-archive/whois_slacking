@@ -61,7 +61,7 @@ module WhoIsSlacking
             task.current_state != 'unestimated' &&
             task.current_state != 'unscheduled' &&
             task.current_state != 'accepted' 
-          WhoIsSlacking::DataTools.save_task(project_object.name, task.id, task.name, task.owned_by, task.current_state, task.accepted_at )
+          WhoIsSlacking::DataTools.save_task(project_object.name, task.id, task.name, task.owned_by, task.current_state, task.accepted_at, task.url )
         end
       end
     end
@@ -124,17 +124,18 @@ module WhoIsSlacking
       end 
     end 
 
-    def self.save_task(project, task_id, task, user, current_state, accepted_at, options={})
+    def self.save_task(project, task_id, task, user, current_state, accepted_at, url, options={})
 
       # dont use accepted_at
       accepted_at = accepted_at 
+      url = url 
       created_dt = DateTime.now.to_s
       start_dt = DateTime.now.to_s
       updated_dt = created_dt
       current_state = current_state 
       active = true
       message = nil 
-      task_entity = {project: project, task_id: task_id, task: task, user: user, current_state: current_state, active: active, start_dt: start_dt, created_dt: created_dt, accepted_at: accepted_at, updated_dt: updated_dt}
+      task_entity = {project: project, task_id: task_id, task: task, user: user, current_state: current_state, url: url, active: active, start_dt: start_dt, created_dt: created_dt, accepted_at: accepted_at, updated_dt: updated_dt}
       # initialize datastore type
       store = whois_store
       mutex = Moneta::Mutex.new(store, 'moneta')
@@ -158,11 +159,11 @@ module WhoIsSlacking
 
           days_worked = TimeDifference.between(DateTime.now,  start_dt).in_days 
           if days_worked >= 1.0 
-            message = "*#{user} has spent #{days_worked.to_i} days working on #{task}*"
+            message = "*#{user}* has spent *#{days_worked.to_i} days* working on <#{url}|#{task}>"
           else # show hours instead
             # hours_worked = TimeDifference.between(DateTime.now,  start_dt).in_hours
             # message = "*#{user} has spent #{hours_worked.to_i} hours working on #{task}*"
-            message = "*#{user} has spent less than a day working on #{task}*"
+            message = "*#{user}* has spent *less than a day* working on <#{url}|#{task}>"
           end
           # keep the created dt and start_dt
           created_dt = entity_exists[:created_dt]
@@ -178,9 +179,9 @@ module WhoIsSlacking
 
           days_worked = TimeDifference.between(DateTime.now,  start_dt).in_days 
           if days_worked >= 1.0 
-            message = "*Task #{task} has been in a delivered state for #{days_worked.to_i} days*"
+            message = "Task <#{url}|#{task}> has been in a *delivered state for #{days_worked.to_i} days*"
           else
-            message = "*Task #{task} has been in a delivered state for less than a day*"
+            message = "Task <#{url}|#{task}> has been in a *delivered state for less than a day*"
           end
         elsif entity_exists && entity_exists[:current_state] == 'finished' 
           # don't do anything if entity already exists as delivered
@@ -190,22 +191,22 @@ module WhoIsSlacking
           #     -- save who started task
           store[mkey] = task_entity 
 
-          if current_state != "finished" #     -- if task is not-completed in pivotal and is not in db
+          if current_state != "finished" && current_state != "delivered" #     -- if task is not-completed in pivotal and is not in db
             #       -- save status as status not-completed
             #       -- publish message task/user started today
             #         -- "Today Johnny started 'As a user I should be able to log in'"
-            message = "*Now tracking #{user} as doing #{task}*"
+            message = "Now tracking *#{user}* as doing <#{url}|#{task}>"
 
           elsif current_state == "finished" #     -- if task is completed in pivotal and is not in db
             #       -- save status as status completed
             #       -- publish message task/user started today
             #         -- "Today Johnny completed 'As a user I should be able to log in'"
-            message = "*Today #{user} finished #{task} and it is waiting to be delivered*"
+            message = "Today *#{user} finished* <#{url}|#{task}> and it is *waiting to be delivered*"
           elsif current_state == "delivered" #     -- if task is completed in pivotal
             #       -- save status as status completed
             #       -- publish message task/user started today
             #         -- "Today Johnny completed 'As a user I should be able to log in'"
-            message = "*Today #{user} delivered #{task} and it is waiting to be accepted*"
+            message = "Today *#{user} delivered* <#{url}|#{task}> and it is *waiting to be accepted*"
           end
 
         end
