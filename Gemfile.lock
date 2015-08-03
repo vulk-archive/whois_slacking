@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    whois_slacking (0.0.4)
+    whois_slacking (0.0.5)
       dotenv (~> 2.0.2)
       moneta (~> 0.8.0)
       multi_xml (~> 0.5)
@@ -117,6 +117,7 @@ GEM
     thread_safe (0.3.5)
     time_difference (0.4.2)
       activesupport
+    timecop (0.8.0)
     typhoeus (0.3.3)
       mime-types
     tzinfo (1.2.2)
@@ -125,7 +126,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.1)
     vcr (2.9.3)
-    websocket-driver (0.6.0)
+    websocket-driver (0.6.2)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
 
@@ -136,5 +137,6 @@ DEPENDENCIES
   byebug
   guard-rspec (~> 4.2)
   rspec (~> 2.13)
+  timecop
   vcr (~> 2.4)
   whois_slacking!

@@ -168,8 +168,8 @@ module WhoIsSlacking
           # keep the created dt and start_dt
           created_dt = entity_exists[:created_dt]
           start_dt = entity_exists[:start_dt].to_datetime
-          task_entity["created_dt"] = created_dt
-          task_entity["start_dt"] = start_dt.to_s
+          task_entity[:created_dt] = created_dt
+          task_entity[:start_dt] = start_dt.to_s
           puts "start_dt in db will be #{start_dt}"
           store[mkey] = task_entity 
 

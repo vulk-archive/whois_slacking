@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'vcr',["~> 2.4"]
   s.add_development_dependency 'guard-rspec', ["~> 4.2"]
   s.add_development_dependency 'byebug'
+  s.add_development_dependency 'timecop'
 #  s.add_development_dependency 'debugger'
 
   s.add_runtime_dependency "pivotal-tracker", ["~> 0.5.13"]
